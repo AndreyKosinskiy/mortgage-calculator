@@ -5,4 +5,4 @@ build_image_old:
 run_container_old:
 	docker run -d -p 8080:8080 mortgage-calculator
 run_container:
-	docker-compose -f ./deployments/docker-compose.yml up
+	docker-compose -f ./deployments/docker-compose.yml up --build

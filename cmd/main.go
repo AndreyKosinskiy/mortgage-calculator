@@ -31,5 +31,5 @@ func main() {
 }
 
 func SpinInDocker(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "\nSpin in Docker container")
+	fmt.Fprint(w, "\nSpin in Docker container and Run throw Docker-compose!!")
 }
