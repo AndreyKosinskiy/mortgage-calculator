@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="/static/css/sidebar.css" rel="stylesheet">
+  <link href="/static/css/bootstrap.css" rel="stylesheet">
+  <link href="/static/css/bootstrap-icons.css" rel="stylesheet">
+  <title>Martgage calculator</title>
+</head>
+
+<body>
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">Martgage calc</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/bank-list">Bank List</a>
+            </li>
+          </ul>
+          <form class="d-flex">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+          </form>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <form action="/banks/" id="bank-form" method="POST">
+          <h2>Bank managment</h2>
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" placeholder="City Bank" value="{{.Bank.Name}}" disabled>
+          </div>
+          <label for="rate" class="form-label">Rate</label>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" id="rate" placeholder="10" value="{{.Bank.Rate}}" disabled>
+            <span class="input-group-text" id="basic-addon2">%</span>
+          </div>
+          <label for="max-loan" class="form-label">Maximum loan</label>
+          <div class="input-group mb-3">
+            <input type="number" class="form-control" id="max-loan" placeholder="100 000" step="1000"
+              value={{.Bank.MaxLoan}} disabled>
+            <span class="input-group-text" id="basic-addon2">$</span>
+          </div>
+          <label for="min-down-payment" class="form-label">Minimun down payment</label>
+          <div class="input-group mb-3">
+            <input type="number" class="form-control" id="min-down-payment" placeholder="10000" step="1000"
+              value={{.Bank.MinDownPayment}} disabled>
+            <span class="input-group-text" id="basic-addon2">$</span>
+          </div>
+          <label for="loan-term" class="form-label">Loan term</label>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" id="loan-term" placeholder="6" value="{{.Bank.LoanTerm}}" disabled>
+            <span class="input-group-text" id="basic-addon2">month</span>
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-primary mb-3" id="bank-edit">Edit</button>
+            <button type="submit" class="btn btn-success mb-3 d-none" id="bank-save">Save</button>
+            <button type="submit" class="btn btn-danger mb-3 d-none" id="bank-cancel">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="/static/js/bootstrap.bundle.js"></script>
+  <script>
+    const form = document.getElementById('bank-form');
+    const input = document.getElementById("name");
+    const editBtn = document.getElementById("bank-edit");
+    const saveBtn = document.getElementById("bank-save");
+    const cancelBtn = document.getElementById("bank-cancel");
+      let editBank = (e) => {
+        e.preventDefault();
+        [...form.elements].forEach((item) => {
+          item.removeAttribute('disabled')
+
+          const input = document.getElementById("name")
+          input.focus()
+
+          saveBtn.classList.remove("d-none")
+          cancelBtn.classList.remove("d-none")
+          editBtn.classList.add("d-none")
+
+        });
+      }
+
+      let cancelBank = (e) => {
+        e.preventDefault();
+        [...form.elements].forEach((item) => {
+          if (item.tagName.toLocaleLowerCase() == 'input') {
+            item.setAttribute('disabled', "")
+          }
+          saveBtn.classList.add("d-none")
+          cancelBtn.classList.add("d-none")
+          editBtn.classList.remove("d-none")
+
+        });
+      }
+
+      let btn = document.getElementById("bank-edit")
+      btn.addEventListener("click", editBank)
+
+      btn = document.getElementById("bank-cancel")
+      btn.addEventListener("click", cancelBank)
+  </script>
+</body>
+
+</html>

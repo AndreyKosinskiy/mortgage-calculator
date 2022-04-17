@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="/static/css/sidebar.css" rel="stylesheet">
+  <link href="/static/css/bootstrap.css" rel="stylesheet">
+  <link href="/static/css/bootstrap-icons.css" rel="stylesheet">
+  <title>Martgage calculator</title>
+</head>
+
+<body>
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">Martgage calc</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/bank-list">Bank List</a>
+            </li>
+          </ul>
+          <form class="d-flex">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+          </form>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <form action="/bank-list" id="bank-form" method="POST">
+          <h2>Fill your bank</h2>
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name"  placeholder="City Bank">
+          </div>
+          <label for="rate" class="form-label">Rate</label>
+          <div class="input-group mb-3"> 
+            <input type="text" class="form-control" id="rate" name ="rate" placeholder="10">
+            <span class="input-group-text" id="basic-addon2">%</span>
+          </div>
+          <label for="max-loan" class="form-label">Maximum loan</label>
+          <div class="input-group mb-3">
+            <input type="number" class="form-control" id="max-loan" name = "max-loan" placeholder="100 000">
+            <span class="input-group-text" id="basic-addon2">$</span>
+          </div>
+          <label for="min-down-payment" class="form-label">Minimun down payment</label>
+          <div class="input-group mb-3">
+            <input type="number" class="form-control" id="min-down-payment" name="min-down-payment" placeholder="10000">
+            <span class="input-group-text" id="basic-addon2">$</span>
+          </div>
+          <label for="loan-term" class="form-label">Loan term</label>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" id="loan-term" name="loan-term"  placeholder="6">
+            <span class="input-group-text" id="basic-addon2">month</span>
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-success mb-3" id="bank-save">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="/static/js/bootstrap.bundle.js"></script>
+</body>
+
+</html>
