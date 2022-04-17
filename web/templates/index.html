@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="/static/css/sidebar.css" rel="stylesheet">
+  <link href="/static/css/bootstrap.css" rel="stylesheet">
+  <link href="/static/css/bootstrap-icons.css" rel="stylesheet">
+  <title>Martgage calculator</title>
+</head>
+
+<body>
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">Martgage calc</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/bank-list">Bank List</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/bank">Create Bank</a>
+            </li>
+          </ul>
+          <form class="d-flex">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+          </form>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <div class="container">
+    <div class="row justify-content-md-center">
+      <form action="/" class="row justify-content-md-center" method="POST">
+        <h1 class="display-1 text-center">Martgage calculator</h1>
+        <div class="col-4">
+          <div class="mb-3">
+            <label for="init-loan" class="form-label">Initial loan</label>
+            <input type="number" class="form-control" id="init-loan" name="init-loan" placeholder="10000">
+          </div>
+          <div class="mb-3">
+            <label for="down-payment" class="form-label">Down payment</label>
+            <input type="number" class="form-control" id="down-payment" name="down-payment" placeholder="10000">
+          </div>
+          <div class="mb-3">
+            <label for="down-payment" class="form-label">Bank</label>
+            <select class="form-select" aria-label="Default select example" placeholder="Choose bank" id="name"
+              name="name">
+              {{ if .}}
+              {{ range .BankNameList }}
+              <option value="{{ . }}">{{ . }}</option>
+              {{ end }}
+              {{ end }}
+            </select>
+          </div>
+          <div class="col-auto">
+            <button type="reset" class="btn btn-danger mb-3">Reset</button>
+            <button type="submit" class="btn btn-primary mb-3">Calculate</button>
+          </div>
+      </form>
+    </div>
+    {{ if .ValidationMsg }}
+      <div id="validation-msg"></div>
+      {{ end }}
+      {{ if .MonthMartgagePaymentMsg }}
+      <div id="month-mortgage-payment"></div>
+      {{ end }}
+    <div class="row">
+      <div class="col-12">
+        <h2>Last martgage calculation</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Init loan</th>
+              <th scope="col">Down payment</th>
+              <th scope="col">Bank</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Mark</td>
+              <td>Mark</td>
+              <td>Otto</td>
+              <td>@mdo</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  </div>
+  <script src="/static/js/bootstrap.bundle.js"></script>
+  <script>
+    var validationMsg = document.getElementById('validation-msg')
+    var monthMortgagePayment = document.getElementById('month-mortgage-payment')
+
+    function alert(message, type, placeholder) {
+      var wrapper = document.createElement('div')
+      wrapper.innerHTML = '<div class="alert alert-' + type + ' alert-dismissible text-center" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
+
+      placeholder.append(wrapper)
+    }
+    {{ if .ValidationMsg }} alert(`{{.ValidationMsg}}`,"danger",validationMsg) {{ end }}
+    {{ if .MonthMartgagePaymentMsg }} alert(`{{.MonthMartgagePaymentMsg}}`,"success",monthMortgagePayment) {{ end }}
+  </script>
+</body>
+
+</html>
