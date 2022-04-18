@@ -1,5 +1,12 @@
+ifneq (,$(wildcard ./.env))
+    include .env
+    export
+endif
+
 run:
 	docker-compose -f ./deployments/docker-compose.yml up --build
+migrate:
+	migrate -database postgres://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}/${DATABASE_NAME}?sslmode=${DATABASE_SSL_MODE} -path internal/migrations up
 build_:
 	cd cmd && go build -o ../build/backend.exe
 run_:

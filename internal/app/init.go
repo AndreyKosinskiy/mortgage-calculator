@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	_ "github.com/lib/pq"
 )
 
 func initServer(port string) http.Server {
@@ -27,8 +29,16 @@ func initRoutes(a *App) *http.ServeMux {
 	return route
 }
 
-func initDatabase(settings string) *sql.DB {
-	return nil
+func initDatabase(dbURL string) *sql.DB {
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Fatalf("Can`t open database: %s", err)
+	}
+	err = db.Ping()
+	if err != nil {
+		log.Fatalf("Can`t ping database: %s", err)
+	}
+	return db
 }
 
 func initLogger(debugLevel int) *log.Logger {
