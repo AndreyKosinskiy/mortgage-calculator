@@ -30,6 +30,7 @@ func (a *App) Run() {
 		signal.Notify(sigint, os.Interrupt)
 		<-sigint
 
+		defer a.db.Close()
 		if err := a.server.Shutdown(context.Background()); err != nil {
 			log.Printf("HTTP server Shutdown: %v", err)
 		}
