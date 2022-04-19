@@ -6,7 +6,7 @@ This is an example of how you may give instructions on setting up your project l
 
 1. Clone the repo:
     ```sh
-       git clone https://github.com/your_username_/Project-Name.git
+       git clone https://github.com/AndreyKosinskiy/mortgage-calculator.git
     ```
 2. Run it!
 
