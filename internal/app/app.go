@@ -10,7 +10,7 @@ import (
 )
 
 type App struct {
-	server http.Server
+	server *http.Server
 	db     *sql.DB
 	logger *log.Logger
 }

@@ -10,10 +10,10 @@ import (
 
 type BankRepository struct {
 	db     *sql.DB
-	logger log.Logger
+	logger *log.Logger
 }
 
-func New(db *sql.DB, logger log.Logger) *BankRepository {
+func New(db *sql.DB, logger *log.Logger) *BankRepository {
 	return &BankRepository{db, logger}
 }
 

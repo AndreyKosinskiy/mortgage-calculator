@@ -44,7 +44,7 @@ func (a *App) MortgageCalcHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := MortgageCalcResponse{}
-	repo := bankrepository.New(a.db, *a.logger)
+	repo := bankrepository.New(a.db, a.logger)
 	a.logger.Printf("%v: %s %s %s ", time.Now(), "MortgageCalcHandler", r.URL.Path, r.Method)
 
 	bs, err := repo.BankList(r.Context())
@@ -108,7 +108,7 @@ func (a *App) BankListHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := BankListResponse{}
-	repo := bankrepository.New(a.db, *a.logger)
+	repo := bankrepository.New(a.db, a.logger)
 	a.logger.Printf("%v: %s %s %s ", time.Now(), "BankListHandler", r.URL.Path, r.Method)
 
 	switch r.Method {
@@ -146,7 +146,7 @@ func (a *App) BankListHandler(w http.ResponseWriter, r *http.Request) {
 		b := &models.Bank{Name: name, Rate: rate, MaxLoan: maxLoan, MinDownPayment: minDownPayment, LoanTerm: uint(loanTerm)}
 		b, err = repo.Create(r.Context(), b)
 		if err != nil {
-			http.Error(w, "can`t create bank", 404)
+			http.Error(w, "can`t create bank: Bank name must be unique!", 404)
 		}
 
 		a.logger.Printf("Created: %+v", b)
@@ -175,7 +175,7 @@ func (a *App) BankHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := BankResponse{}
-	repo := bankrepository.New(a.db, *a.logger)
+	repo := bankrepository.New(a.db, a.logger)
 	name := strings.TrimPrefix(r.URL.Path, "/bank-list/")
 	a.logger.Printf("%v: %s %s %s ", time.Now(), "BankHandler", r.URL.Path, r.Method)
 
@@ -262,7 +262,7 @@ func (a *App) BankDeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	repo := bankrepository.New(a.db, *a.logger)
+	repo := bankrepository.New(a.db, a.logger)
 	a.logger.Printf("%v: %s %s ", time.Now(), r.URL.Path, r.Method)
 
 	err := r.ParseForm()

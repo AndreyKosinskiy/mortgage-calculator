@@ -9,8 +9,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func initServer(port string) http.Server {
-	s := http.Server{
+func initServer(port string) *http.Server {
+	s := &http.Server{
 		Addr: port,
 	}
 	return s
