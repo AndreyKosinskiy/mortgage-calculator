@@ -20,7 +20,7 @@ func NewConfig() *Config {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	port := ":" + os.Getenv("APP_PORT")
+	port := ":" + os.Getenv("PORT")
 	debugLevel, err := strconv.Atoi(os.Getenv("APP_DEBUG_LEVEL"))
 	if err != nil {
 		log.Fatalf("Can`t parse config field debugLevel: %s", err)
