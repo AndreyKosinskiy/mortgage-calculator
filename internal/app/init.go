@@ -19,7 +19,7 @@ func initServer(port string) *http.Server {
 func initRoutes(a *App) *http.ServeMux {
 	route := http.DefaultServeMux
 
-	fs := http.FileServer(http.Dir("../web/static/"))
+	fs := http.FileServer(http.Dir("./web/static/"))
 	route.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	route.HandleFunc("/", a.MortgageCalcHandler)
