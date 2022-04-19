@@ -37,9 +37,43 @@ func (r *BankRepository) Create(ctx context.Context, b *models.Bank) (*models.Ba
 	return nb, nil
 }
 func (r *BankRepository) Update(ctx context.Context, b *models.Bank) (*models.Bank, error) {
-	return nil, nil
+	rows, err := r.db.QueryContext(ctx, update, b.Name, b.Rate, b.MaxLoan, b.MinDownPayment, b.LoanTerm)
+	if err != nil {
+		r.logger.Printf("bankRepository.Update.QueryContext : %s", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	nb := &models.Bank{}
+	var id int
+	for rows.Next() {
+		err := rows.Scan(&id, &nb.Name, &nb.Rate, &nb.MaxLoan, &nb.MinDownPayment, &nb.LoanTerm)
+		if err != nil {
+			r.logger.Printf("bankRepository.Update.Scan: %s", err)
+			return nil, err
+		}
+	}
+
+	return nb, nil
 }
 func (r *BankRepository) Delete(ctx context.Context, b *models.Bank) error {
+	rows, err := r.db.QueryContext(ctx, delete, b.Name)
+	if err != nil {
+		r.logger.Printf("bankRepository.Delete.QueryContext : %s", err)
+		return err
+	}
+	defer rows.Close()
+
+	nb := &models.Bank{}
+	var id int
+	for rows.Next() {
+		err := rows.Scan(&id, &nb.Name, &nb.Rate, &nb.MaxLoan, &nb.MinDownPayment, &nb.LoanTerm)
+		if err != nil {
+			r.logger.Printf("bankRepository.Delete.Scan: %s", err)
+			return err
+		}
+	}
+
 	return nil
 }
 func (r *BankRepository) BankByName(ctx context.Context, n string) (*models.Bank, error) {
@@ -61,6 +95,7 @@ func (r *BankRepository) BankByName(ctx context.Context, n string) (*models.Bank
 
 	return b, nil
 }
+
 func (r *BankRepository) BankList(ctx context.Context) ([]*models.Bank, error) {
 	rows, err := r.db.QueryContext(ctx, list)
 	if err != nil {

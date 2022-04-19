@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Build
-FROM golang:1.16-alpine AS build
+FROM golang:1.17-alpine AS build
 WORKDIR /app
 
 
@@ -19,10 +19,12 @@ FROM gcr.io/distroless/base-debian10 AS deploy
 
 WORKDIR /
 
-COPY --from=build app/build/backend /
+COPY --from=build app/build/backend build/
+COPY --from=build app/.env /
+COPY --from=build app/web /web
 
 EXPOSE 8080
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["/backend"]
+ENTRYPOINT ["build/backend"]

@@ -24,6 +24,7 @@ func initRoutes(a *App) *http.ServeMux {
 
 	route.HandleFunc("/", a.MortgageCalcHandler)
 	route.HandleFunc("/bank", a.BankCreateHandler)
+	route.HandleFunc("/bank/delete", a.BankDeleteHandler)
 	route.HandleFunc("/bank-list", a.BankListHandler)
 	route.HandleFunc("/bank-list/", a.BankHandler)
 	return route

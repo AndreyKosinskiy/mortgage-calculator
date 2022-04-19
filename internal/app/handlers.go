@@ -1,8 +1,6 @@
 package app
 
 import (
-	"fmt"
-	"math"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -19,6 +17,7 @@ type MortgageCalcResponse struct {
 	BankNameList            []string
 	ValidationMsg           string
 	MonthMartgagePaymentMsg string
+	MortgageCalcRow         string
 }
 
 // BankListResponse
@@ -60,52 +59,35 @@ func (a *App) MortgageCalcHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	resp.BankNameList = bn
 
-	if r.Method == http.MethodPost {
-		if err := r.ParseForm(); err != nil {
-			http.Error(w, "can`t parse Form from bank_create.html", 404)
-			a.logger.Printf("Error MortgageCalcHandler.ParseForm: %s", err)
-			return
-		}
-
-		initLoan, err := strconv.ParseFloat(r.PostFormValue("init-loan"), 64)
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "can`t parse Form from bank_create.html", 404)
+		a.logger.Printf("Error MortgageCalcHandler.ParseForm: %s", err)
+		return
+	}
+	a.logger.Printf("r.Form: %#v", r.Form)
+	if r.Form.Has("init-loan") && r.Form.Has("down-payment") && r.Form.Has("name") {
+		initLoan, err := strconv.ParseFloat(r.FormValue("init-loan"), 64)
 		if err != nil {
 			http.Error(w, "can`t parse form[init-loan]", 404)
-			a.logger.Printf("Error MortgageCalcHandler.PostFormValue.init-loan: %s", err)
+			a.logger.Printf("Error MortgageCalcHandler.FormValue.init-loan: %s", err)
 			return
 		}
-		downPayment, err := strconv.ParseFloat(r.PostFormValue("down-payment"), 64)
+		downPayment, err := strconv.ParseFloat(r.FormValue("down-payment"), 64)
 		if err != nil {
 			http.Error(w, "can`t parse form[down-payment]", 404)
-			a.logger.Printf("Error MortgageCalcHandler.PostFormValue.down-payment: %s", err)
+			a.logger.Printf("Error MortgageCalcHandler.FormValue.down-payment: %s", err)
 			return
 		}
-		name := r.PostFormValue("name")
+		name := r.FormValue("name")
 
+		a.logger.Printf("r.Form: %v,%v,%v", initLoan, downPayment, name)
 		b, err := repo.BankByName(r.Context(), name)
 		if err != nil {
 			http.Error(w, "can`t get bank by name", 404)
 			a.logger.Printf("Error MortgageCalcHandler.BankByName: %s", err)
 			return
 		}
-
-		validMessages := make([]string, 2)
-		if initLoan > b.MaxLoan || downPayment < b.MinDownPayment {
-			if initLoan > b.MaxLoan {
-				validMessages[0] = "Initial loan not satisfies the maximum loan boundary of the bank."
-			}
-			if downPayment < b.MinDownPayment {
-				validMessages[1] = "Down payment not satisfies the minimum down payment boundary of the bank."
-			}
-			if validMessages[0] != "" && validMessages[1] != "" {
-				resp.ValidationMsg = strings.Join(validMessages, "\n")
-			} else {
-				resp.ValidationMsg = strings.Join(validMessages, "")
-			}
-		} else {
-			//calculate monthly mortgage payment
-			mmp := (float64(initLoan) * (b.Rate / 100 / 12) * math.Pow((1+b.Rate/100/12), float64(b.LoanTerm))) / (math.Pow((1+b.Rate/100/12), float64(b.LoanTerm)) - 1)
-			resp.MonthMartgagePaymentMsg = fmt.Sprintf("Your month mortgage payment: %.2f$", mmp)
-		}
+		calcMMP(&resp, b, name, initLoan, downPayment)
 	}
 	err = tmpl.Execute(w, resp)
 	if err != nil {
@@ -138,7 +120,6 @@ func (a *App) BankListHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		resp.BankList = bs
 		a.logger.Println("bs len: ", len(bs))
-		tmpl.Execute(w, resp)
 	case http.MethodPost:
 		if err := r.ParseForm(); err != nil {
 			http.Error(w, "can`t parse Form from bank_create.html", 404)
@@ -170,9 +151,14 @@ func (a *App) BankListHandler(w http.ResponseWriter, r *http.Request) {
 
 		a.logger.Printf("Created: %+v", b)
 		a.logger.Println("Try Redirect to: /bank-list/" + name)
-		r.Method = http.MethodGet
-		http.Redirect(w, r, "/bank-list/"+name, http.StatusMovedPermanently)
+		http.Redirect(w, r, "/bank-list/"+name, http.StatusSeeOther)
+		return
 	default:
+	}
+	err = tmpl.Execute(w, resp)
+	if err != nil {
+		http.Error(w, "can`t execute template", 404)
+		return
 	}
 }
 
@@ -190,11 +176,11 @@ func (a *App) BankHandler(w http.ResponseWriter, r *http.Request) {
 
 	resp := BankResponse{}
 	repo := bankrepository.New(a.db, *a.logger)
+	name := strings.TrimPrefix(r.URL.Path, "/bank-list/")
 	a.logger.Printf("%v: %s %s %s ", time.Now(), "BankHandler", r.URL.Path, r.Method)
 
 	switch r.Method {
 	case http.MethodGet:
-		name := strings.TrimPrefix(r.URL.Path, "/bank-list/")
 		b, err := repo.BankByName(r.Context(), name)
 		if b.Name == "" || err != nil {
 			http.Error(w, "can`t find bank by name", 400)
@@ -202,10 +188,45 @@ func (a *App) BankHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		a.logger.Println("found bank: ", b.Name)
 		resp.Bank = b
-		tmpl.Execute(w, resp)
 	case http.MethodPost:
-		tmpl.Execute(w, resp)
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "can`t parse Form from bank_create.html", 404)
+			return
+		}
+		name := r.PostFormValue("name")
+		rate, err := strconv.ParseFloat(r.PostFormValue("rate"), 64)
+		if err != nil {
+			http.Error(w, "can`t parse form[rate]", 404)
+		}
+		maxLoan, err := strconv.ParseFloat(r.PostFormValue("max-loan"), 64)
+		if err != nil {
+			http.Error(w, "can`t parse form[max-loan]", 404)
+		}
+		minDownPayment, err := strconv.ParseFloat(r.PostFormValue("min-down-payment"), 64)
+		if err != nil {
+			http.Error(w, "can`t parse form[min-down-payment]", 404)
+		}
+		loanTerm, err := strconv.Atoi(r.PostFormValue("loan-term"))
+		if err != nil {
+			http.Error(w, "can`t parse form[loan-term]", 404)
+		}
+
+		b := &models.Bank{Name: name, Rate: rate, MaxLoan: maxLoan, MinDownPayment: minDownPayment, LoanTerm: uint(loanTerm)}
+		nb, err := repo.Update(r.Context(), b)
+		if nb.Name == "" || err != nil {
+			http.Error(w, "can`t find bank by name", 400)
+			return
+		}
+		a.logger.Println("bank updated: ", b.Name)
+
+		http.Redirect(w, r, "/bank-list/"+name, http.StatusSeeOther)
+		return
 	default:
+	}
+	err = tmpl.Execute(w, resp)
+	if err != nil {
+		http.Error(w, "can`t execute template", 404)
+		return
 	}
 }
 
@@ -224,5 +245,55 @@ func (a *App) BankCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	resp := BankResponse{}
 	a.logger.Printf("%v: %s %s ", time.Now(), r.URL.Path, r.Method)
-	tmpl.Execute(w, resp)
+	err = tmpl.Execute(w, resp)
+	if err != nil {
+		http.Error(w, "can`t execute template", 404)
+		return
+	}
+}
+
+func (a *App) BankDeleteHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/bank/delete" {
+		http.Error(w, "can`t parse form index.html", 404)
+		return
+	}
+	if r.Method != http.MethodPost {
+		http.Error(w, "can use only GET method index.html", 404)
+		return
+	}
+
+	repo := bankrepository.New(a.db, *a.logger)
+	a.logger.Printf("%v: %s %s ", time.Now(), r.URL.Path, r.Method)
+
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "can`t parse form index.html", 404)
+		return
+	}
+	a.logger.Printf("%#v", r.PostForm)
+	name := r.PostFormValue("name")
+	rate, err := strconv.ParseFloat(r.PostFormValue("rate"), 64)
+	if err != nil {
+		http.Error(w, "can`t parse form[rate]", 404)
+	}
+	maxLoan, err := strconv.ParseFloat(r.PostFormValue("max-loan"), 64)
+	if err != nil {
+		http.Error(w, "can`t parse form[max-loan]", 404)
+	}
+	minDownPayment, err := strconv.ParseFloat(r.PostFormValue("min-down-payment"), 64)
+	if err != nil {
+		http.Error(w, "can`t parse form[min-down-payment]", 404)
+	}
+	loanTerm, err := strconv.Atoi(r.PostFormValue("loan-term"))
+	if err != nil {
+		http.Error(w, "can`t parse form[loan-term]", 404)
+	}
+
+	b := &models.Bank{Name: name, Rate: rate, MaxLoan: maxLoan, MinDownPayment: minDownPayment, LoanTerm: uint(loanTerm)}
+	err = repo.Delete(r.Context(), b)
+	if err != nil {
+		http.Error(w, "can`t delete bank", 404)
+		return
+	}
+	http.Redirect(w, r, "/bank-list", http.StatusFound)
 }

@@ -38,21 +38,22 @@
   </header>
   <div class="container">
     <div class="row justify-content-md-center">
-      <form action="/" class="row justify-content-md-center" method="POST">
+      <form action="/" class="row justify-content-md-center" method="GET">
         <h1 class="display-1 text-center">Martgage calculator</h1>
         <div class="col-4">
           <div class="mb-3">
             <label for="init-loan" class="form-label">Initial loan</label>
-            <input type="number" class="form-control" id="init-loan" name="init-loan" placeholder="10000">
+            <input type="number" class="form-control" id="init-loan" name="init-loan" placeholder="10000" required>
           </div>
           <div class="mb-3">
             <label for="down-payment" class="form-label">Down payment</label>
-            <input type="number" class="form-control" id="down-payment" name="down-payment" placeholder="10000">
+            <input type="number" class="form-control" id="down-payment" name="down-payment" placeholder="10000"
+              required>
           </div>
           <div class="mb-3">
             <label for="down-payment" class="form-label">Bank</label>
             <select class="form-select" aria-label="Default select example" placeholder="Choose bank" id="name"
-              name="name">
+              name="name" required>
               {{ if .}}
               {{ range .BankNameList }}
               <option value="{{ . }}">{{ . }}</option>
@@ -67,30 +68,27 @@
       </form>
     </div>
     {{ if .ValidationMsg }}
-      <div id="validation-msg"></div>
-      {{ end }}
-      {{ if .MonthMartgagePaymentMsg }}
-      <div id="month-mortgage-payment"></div>
-      {{ end }}
+    <div id="validation-msg"></div>
+    {{ end }}
+    {{ if .MonthMartgagePaymentMsg }}
+    <div id="month-mortgage-payment"></div>
+    {{ end }}
     <div class="row">
       <div class="col-12">
-        <h2>Last martgage calculation</h2>
-        <table class="table">
+        <h2 class="d-inline-block">Last success martgage calculation</h2>
+        <button class="btn btn-link btn-sm text-danger d-inline-block" id="clear-table-btn">Clear table</button>
+        <table class="table" id="martgage-calculation-success">
           <thead>
             <tr>
               <th scope="col">Date</th>
               <th scope="col">Init loan</th>
               <th scope="col">Down payment</th>
-              <th scope="col">Bank</th>
+              <th scope="col" >Bank</th>
+              <th scope="col">Month Mortgae Payment</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Mark</td>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
-            </tr>
+
           </tbody>
         </table>
       </div>
@@ -108,8 +106,42 @@
 
       placeholder.append(wrapper)
     }
-    {{ if .ValidationMsg }} alert(`{{.ValidationMsg}}`,"danger",validationMsg) {{ end }}
-    {{ if .MonthMartgagePaymentMsg }} alert(`{{.MonthMartgagePaymentMsg}}`,"success",monthMortgagePayment) {{ end }}
+    {{ if .ValidationMsg }} alert(`{{.ValidationMsg}}`, "danger", validationMsg) {{ end }}
+    {{ if .MonthMartgagePaymentMsg }} alert(`{{.MonthMartgagePaymentMsg}}`, "success", monthMortgagePayment) {{ end }}
+
+    if (localStorage.getItem("lastSuccessMartageCalc") === null) {
+      localStorage.setItem("lastSuccessMartageCalc", '')
+    } 
+    const rowData = "{{.MortgageCalcRow}}"
+    if (rowData != "") {
+        oldData = localStorage.getItem("lastSuccessMartageCalc")
+        newData = oldData === "" ? "{{.MortgageCalcRow}}" : oldData + ";" + "{{.MortgageCalcRow}}"
+        localStorage.setItem("lastSuccessMartageCalc", newData)
+      }
+      let cells = localStorage.getItem("lastSuccessMartageCalc").split(";")
+      let table = document.getElementById("martgage-calculation-success")
+      let tr = document.createElement("tr")
+      let td;
+      for (i = 0; i < cells.length; i++) {
+        td = document.createElement("td")
+        td.textContent = cells[i]
+
+        console.log(td.textContent)
+        tr.appendChild(td)
+        if (i != 0 && (i+1) % 5 == 0) {
+          table.getElementsByTagName('tbody')[0].appendChild(tr)
+          tr = document.createElement("tr")
+        }
+      }
+      
+      clearTableBtn = document.getElementById("clear-table-btn")
+      clearTable = ()=>{
+        delete localStorage.removeItem('lastSuccessMartageCalc')
+        while (table.getElementsByTagName('tbody')[0].firstChild) {
+          table.getElementsByTagName('tbody')[0].removeChild(table.getElementsByTagName('tbody')[0].firstChild );
+        }
+      }
+      clearTableBtn.addEventListener("click",clearTable)
   </script>
 </body>
 
