@@ -118,20 +118,32 @@
         newData = oldData === "" ? "{{.MortgageCalcRow}}" : oldData + ";" + "{{.MortgageCalcRow}}"
         localStorage.setItem("lastSuccessMartageCalc", newData)
       }
+      
       let cells = localStorage.getItem("lastSuccessMartageCalc").split(";")
+      let rows=new Array()
+      let row = new Array()
+      for(i = 0; i < cells.length; i++){
+        row.push(cells[i])
+        if (i != 0 && (i+1)%5==0){
+          rows.push(row)
+          row = new Array()
+        }
+      }
+      console.log(row)
+      console.log("rows",rows)
       let table = document.getElementById("martgage-calculation-success")
       let tr = document.createElement("tr")
       let td;
-      for (i = 0; i < cells.length; i++) {
-        td = document.createElement("td")
-        td.textContent = cells[i]
-
-        console.log(td.textContent)
-        tr.appendChild(td)
-        if (i != 0 && (i+1) % 5 == 0) {
-          table.getElementsByTagName('tbody')[0].appendChild(tr)
-          tr = document.createElement("tr")
+      
+      for (i = rows.length-1; i >= 0; i--) {
+        row = rows[i]
+        for (j = 0; j < row.length; j++){
+          td = document.createElement("td")
+          td.textContent = row[j]
+          tr.appendChild(td)
         }
+        table.getElementsByTagName('tbody')[0].appendChild(tr)
+        tr = document.createElement("tr")
       }
       
       clearTableBtn = document.getElementById("clear-table-btn")
