@@ -36,35 +36,36 @@
   <div class="container">
     <div class="row">
       <div class="col-12">
-        <form action="/banks/" id="bank-form" method="POST">
+        <form action="/bank-list/{{.Bank.Name}}" id="bank-form" method="POST">
           <h2>Bank managment</h2>
           <div class="mb-3">
             <label for="name" class="form-label">Name</label>
-            <input type="text" class="form-control" id="name" placeholder="City Bank" value="{{.Bank.Name}}" disabled>
+            <input type="text" class="form-control" id="name" name="name" placeholder="City Bank" value="{{.Bank.Name}}" readonly>
           </div>
           <label for="rate" class="form-label">Rate</label>
           <div class="input-group mb-3">
-            <input type="text" class="form-control" id="rate" placeholder="10" value="{{.Bank.Rate}}" disabled>
+            <input type="text" class="form-control" id="rate" name="rate" placeholder="10" value="{{.Bank.Rate}}" readonly>
             <span class="input-group-text" id="basic-addon2">%</span>
           </div>
           <label for="max-loan" class="form-label">Maximum loan</label>
           <div class="input-group mb-3">
-            <input type="number" class="form-control" id="max-loan" placeholder="100 000" step="1000"
-              value={{.Bank.MaxLoan}} disabled>
+            <input type="number" class="form-control" id="max-loan" name="max-loan" placeholder="100 000"
+              value={{.Bank.MaxLoan}} readonly>
             <span class="input-group-text" id="basic-addon2">$</span>
           </div>
           <label for="min-down-payment" class="form-label">Minimun down payment</label>
           <div class="input-group mb-3">
-            <input type="number" class="form-control" id="min-down-payment" placeholder="10000" step="1000"
-              value={{.Bank.MinDownPayment}} disabled>
+            <input type="number" class="form-control" id="min-down-payment" name="min-down-payment" placeholder="10000"
+              value={{.Bank.MinDownPayment}} readonly>
             <span class="input-group-text" id="basic-addon2">$</span>
           </div>
           <label for="loan-term" class="form-label">Loan term</label>
           <div class="input-group mb-3">
-            <input type="text" class="form-control" id="loan-term" placeholder="6" value="{{.Bank.LoanTerm}}" disabled>
+            <input type="text" class="form-control" id="loan-term" name="loan-term" placeholder="6" value="{{.Bank.LoanTerm}}" readonly>
             <span class="input-group-text" id="basic-addon2">month</span>
           </div>
           <div class="col-auto">
+            <button type="submit" class="btn btn-danger mb-3" id="bank-delete">Delete</button>
             <button type="submit" class="btn btn-primary mb-3" id="bank-edit">Edit</button>
             <button type="submit" class="btn btn-success mb-3 d-none" id="bank-save">Save</button>
             <button type="submit" class="btn btn-danger mb-3 d-none" id="bank-cancel">Cancel</button>
@@ -77,22 +78,22 @@
   <script>
     const form = document.getElementById('bank-form');
     const input = document.getElementById("name");
+    const deleteBtn = document.getElementById("bank-delete");
     const editBtn = document.getElementById("bank-edit");
     const saveBtn = document.getElementById("bank-save");
     const cancelBtn = document.getElementById("bank-cancel");
       let editBank = (e) => {
         e.preventDefault();
         [...form.elements].forEach((item) => {
-          item.removeAttribute('disabled')
-
-          const input = document.getElementById("name")
+          if (item.id != "name") item.removeAttribute('readonly')
+        });
+          const input = document.getElementById("rate")
           input.focus()
 
           saveBtn.classList.remove("d-none")
           cancelBtn.classList.remove("d-none")
           editBtn.classList.add("d-none")
-
-        });
+          deleteBtn.classList.add("d-none")
       }
 
       let cancelBank = (e) => {
@@ -101,18 +102,24 @@
           if (item.tagName.toLocaleLowerCase() == 'input') {
             item.setAttribute('disabled', "")
           }
-          saveBtn.classList.add("d-none")
-          cancelBtn.classList.add("d-none")
-          editBtn.classList.remove("d-none")
-
         });
+        saveBtn.classList.add("d-none")
+        cancelBtn.classList.add("d-none")
+        editBtn.classList.remove("d-none")
+        deleteBtn.classList.remove("d-none")
       }
 
-      let btn = document.getElementById("bank-edit")
-      btn.addEventListener("click", editBank)
+    let deleteBank = (e)=>{
+      e.preventDefault();
+      form.action = "/bank/delete"
+      form.submit()
+    }
+      
+      editBtn.addEventListener("click", editBank)
+      deleteBtn.addEventListener("click",deleteBank)
+      cancelBtn.addEventListener("click", cancelBank)
 
-      btn = document.getElementById("bank-cancel")
-      btn.addEventListener("click", cancelBank)
+
   </script>
 </body>
 
