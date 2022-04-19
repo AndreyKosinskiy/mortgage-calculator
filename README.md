@@ -9,7 +9,9 @@ This is an example of how you may give instructions on setting up your project l
        git clone https://github.com/your_username_/Project-Name.git
     ```
 2. Run it!
+
       2.1 Fill .env file or delete .example extention in .env.example file.
+      
       2.2 On local machine:
       ```sh
          go mod download
