@@ -36,7 +36,7 @@ func (a *App) Run() {
 		}
 	}()
 
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := a.server.ListenAndServe(); err != nil {
 		log.Fatal("Error: ", err)
 	}
 }
