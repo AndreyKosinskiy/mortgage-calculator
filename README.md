@@ -9,13 +9,15 @@ This is an example of how you may give instructions on setting up your project l
        git clone https://github.com/your_username_/Project-Name.git
     ```
 2. Run it!
-  2.1 On local machine:
+      2.1 Fill .env file or delete .example extention in .env.example file.
+      2.2 On local machine:
       ```sh
          go mod download
+         make migrate # require postgresql
          make build_
          make run_
       ```
-      2.2 In Docker:
+      2.3 In Docker:
       ```sh
          make run
       ```
@@ -24,7 +26,9 @@ This is an example of how you may give instructions on setting up your project l
 - [x] Add Docker
 - [x] Use inmemory storage
 - [x] Use html/template package
-- [ ] Use PostgreSQL
+- [x] Use PostgreSQL
+- [x] Write test for func calcMMP( month martgage payment )
+- [x] Add success month martagage payment to localStorage
 - [ ] Wirite API
 - [ ] Change html/template to React
 

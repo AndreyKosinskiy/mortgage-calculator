@@ -8,20 +8,49 @@ services:
     ports: 
       - "8080:8080"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    command: ls
     links:
       - db
+    environment:
+      - DATABASE_HOST=db:5432
+    networks:
+      new:
+        aliases:
+          - database
   db:
     container_name: mortgage-calculator-database
     image: postgres:14.1-alpine
     restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
     ports:
       - '5432:5432'
+    healthcheck:
+      test: "pg_isready --username=${DATABASE_USER} && psql --username=${DATABASE_USER} --list"
+      timeout: 10s
+      retries: 20
     volumes:
-      - db:/var/lib/postgresql/data
+      - ./db:/docker-entrypoint-initdb.d/
+    networks:
+      - new
+  migrate:
+    image: migrate/migrate
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ../internal/migrations:/migrations
+    command: -path /migrations -database postgres://${DATABASE_USER}:${DATABASE_PASSWORD}@db:5432/${DATABASE_NAME}?sslmode=${DATABASE_SSL_MODE} up
+    links: 
+      - db
+    networks:
+      - new
 volumes:
   db:
     driver: local
+networks:
+  new:

@@ -4,8 +4,8 @@ package models
 type Bank struct {
 	Name           string
 	Rate           float64
-	MaxLoan        uint
-	MinDownPayment uint
+	MaxLoan        float64
+	MinDownPayment float64
 	LoanTerm       uint
 }
 
