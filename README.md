@@ -3,7 +3,7 @@ Mortgage Calculator is web application where users can create banks and calculat
 
 ## Getting Started
 This is an example of how you may give instructions on setting up your project locally. To get a local copy up and running follow these simple example steps.
-
+See this project on heroku: https://martgage-calculator.herokuapp.com/ or:
 1. Clone the repo:
     ```sh
        git clone https://github.com/AndreyKosinskiy/mortgage-calculator.git
