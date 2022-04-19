@@ -36,7 +36,7 @@ func (a *App) MortgageCalcHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles("../web/templates/index.html")
+	tmpl, err := template.ParseFiles("./web/templates/index.html")
 	if err != nil {
 		http.Error(w, "can`t parse template index.html", 404)
 		a.logger.Printf("Error MortgageCalcHandler.ParseFiles: %s", err)
@@ -101,7 +101,7 @@ func (a *App) BankListHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "can`t parse form index.html", 404)
 		return
 	}
-	tmpl, err := template.ParseFiles("../web/templates/bank_list.html")
+	tmpl, err := template.ParseFiles("./web/templates/bank_list.html")
 	if err != nil {
 		http.Error(w, "can`t parse template index.html", 404)
 		return
@@ -168,7 +168,7 @@ func (a *App) BankHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles("../web/templates/bank.html")
+	tmpl, err := template.ParseFiles("./web/templates/bank.html")
 	if err != nil {
 		http.Error(w, "can`t parse template index.html", 404)
 		return
@@ -235,7 +235,7 @@ func (a *App) BankCreateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "can`t parse form index.html", 404)
 		return
 	}
-	tmpl, err := template.ParseFiles("../web/templates/bank_create.html")
+	tmpl, err := template.ParseFiles("./web/templates/bank_create.html")
 	if err != nil {
 		http.Error(w, "can`t parse template index.html", 404)
 	}
