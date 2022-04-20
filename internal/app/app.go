@@ -35,7 +35,6 @@ func (a *App) Run() {
 			log.Printf("HTTP server Shutdown: %v", err)
 		}
 	}()
-
 	if err := a.server.ListenAndServe(); err != nil {
 		log.Fatal("Error: ", err)
 	}
