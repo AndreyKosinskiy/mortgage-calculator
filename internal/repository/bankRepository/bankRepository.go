@@ -105,16 +105,16 @@ func (r *BankRepository) BankList(ctx context.Context) ([]*models.Bank, error) {
 	defer rows.Close()
 
 	var sb []*models.Bank
-	b := &models.Bank{}
 	var id int
 	for rows.Next() {
+		b := &models.Bank{}
 		err := rows.Scan(&id, &b.Name, &b.Rate, &b.MaxLoan, &b.MinDownPayment, &b.LoanTerm)
+		r.logger.Printf("%#v", b)
 		if err != nil {
 			r.logger.Printf("bankRepository.BankList.Scan: %s", err)
 			return nil, err
 		}
 		sb = append(sb, b)
 	}
-
 	return sb, nil
 }

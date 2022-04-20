@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -55,6 +56,7 @@ func (a *App) MortgageCalcHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	bn := make([]string, len(bs))
 	for i, v := range bs {
+		fmt.Printf("%#+v", v)
 		bn[i] = v.Name
 	}
 	resp.BankNameList = bn
